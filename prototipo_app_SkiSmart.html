@@ -1,0 +1,1468 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SkiMaps - App Prototipo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #1a3a52 0%, #2d5a7b 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 30px;
+        }
+
+        .title {
+            text-align: center;
+            color: white;
+        }
+
+        .title h1 {
+            font-size: 2.2em;
+            margin-bottom: 5px;
+            letter-spacing: -0.5px;
+        }
+
+        .title p {
+            font-size: 0.95em;
+            opacity: 0.8;
+        }
+
+        .phone {
+            perspective: 1200px;
+        }
+
+        .phone-frame {
+            background: white;
+            border-radius: 50px;
+            padding: 14px;
+            box-shadow: 0 30px 80px rgba(0,0,0,0.4);
+            aspect-ratio: 9/19;
+            width: 340px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            z-index: 0;
+        }
+
+        .phone-notch {
+            background: #000;
+            height: 28px;
+            border-radius: 0 0 25px 25px;
+            margin: 0 auto;
+            width: 160px;
+            margin-bottom: 8px;
+        }
+
+        .screen {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            background: white;
+            border-radius: 35px;
+            padding: 50px 24px 90px 24px;
+            display: flex;
+            flex-direction: column;
+            font-size: 1em;
+        }
+
+        .screen::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .screen::-webkit-scrollbar-track {
+            background: #f5f5f5;
+        }
+
+        .screen::-webkit-scrollbar-thumb {
+            background: #ddd;
+            border-radius: 3px;
+        }
+
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.75em;
+            padding: 8px 24px;
+            color: #333;
+            font-weight: 600;
+            background: white;
+            position: absolute;
+            top: 42px;
+            left: 14px;
+            right: 14px;
+            z-index: 10;
+            height: 28px;
+            box-sizing: border-box;
+            border-radius: 8px;
+        }
+
+        .screen h2 {
+            font-size: 1.6em;
+            color: #193682;
+            margin-bottom: 4px;
+            font-weight: 700;
+        }
+
+        .screen-subtitle {
+            font-size: 0.85em;
+            color: #999;
+            margin-bottom: 16px;
+        }
+
+        .screen h3 {
+            font-size: 0.95em;
+            color: #666;
+            margin-top: 18px;
+            margin-bottom: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .saturation-badge {
+            display: inline-block;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 700;
+        }
+
+        .saturation-low {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .saturation-medium {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .saturation-high {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .button {
+            background: #193682;
+            color: white;
+            border: none;
+            padding: 14px 20px;
+            border-radius: 12px;
+            font-size: 0.95em;
+            cursor: pointer;
+            margin-bottom: 10px;
+            width: 100%;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        .button:hover {
+            background: #2d5a7b;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(25, 54, 130, 0.3);
+        }
+
+        .button.secondary {
+            background: #f0f0f0;
+            color: #193682;
+        }
+
+        .button.secondary:hover {
+            background: #e0e0e0;
+        }
+
+        .button.accent {
+            background: #E66432;
+        }
+
+        .button.accent:hover {
+            background: #d45225;
+        }
+
+        .input-group {
+            margin-bottom: 16px;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 0.85em;
+            color: #666;
+            margin-bottom: 6px;
+            font-weight: 600;
+        }
+
+        .input-group input,
+        .input-group select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            font-size: 0.95em;
+        }
+
+        .choice-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .choice-button {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            background: white;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.95em;
+            text-align: left;
+            font-weight: 500;
+        }
+
+        .choice-button:hover {
+            border-color: #193682;
+            background: #f8f9ff;
+        }
+
+        .choice-button.selected {
+            border-color: #193682;
+            background: #193682;
+            color: white;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #eee;
+            font-size: 0.95em;
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .label {
+            color: #999;
+            font-weight: 500;
+        }
+
+        .value {
+            font-weight: 700;
+            color: #193682;
+        }
+
+        .route-card {
+            background: #f8f9fa;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 14px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .route-card:hover {
+            border-color: #193682;
+            box-shadow: 0 4px 12px rgba(25, 54, 130, 0.15);
+        }
+
+        .route-card.selected {
+            background: #f8f9ff;
+            border-color: #193682;
+            box-shadow: 0 4px 12px rgba(25, 54, 130, 0.2);
+        }
+
+        .route-title {
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 6px;
+            font-size: 0.95em;
+        }
+
+        .route-detail {
+            font-size: 0.85em;
+            color: #666;
+            margin: 3px 0;
+        }
+
+        .route-badge {
+            display: inline-block;
+            background: #193682;
+            color: white;
+            padding: 3px 10px;
+            border-radius: 15px;
+            font-size: 0.75em;
+            font-weight: 600;
+            margin-top: 6px;
+            margin-right: 4px;
+        }
+
+        .map-visual {
+            background: linear-gradient(135deg, #d4edda 0%, #fff3cd 50%, #f8d7da 100%);
+            border-radius: 12px;
+            padding: 30px;
+            margin: 12px 0;
+            text-align: center;
+            min-height: 180px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .zone-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .zone-item {
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 0.8em;
+            font-weight: 600;
+            color: white;
+            text-align: center;
+        }
+
+        .zone-low {
+            background: #28A745;
+        }
+
+        .zone-medium {
+            background: #E66432;
+        }
+
+        .zone-high {
+            background: #DC3545;
+        }
+
+        .profile-header {
+            background: linear-gradient(135deg, #193682 0%, #2d5a7b 100%);
+            color: white;
+            padding: 20px;
+            margin: -24px -24px 16px -24px;
+            border-radius: 35px 35px 0 0;
+            text-align: center;
+        }
+
+        .profile-avatar {
+            width: 80px;
+            height: 80px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            margin: 0 auto 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2em;
+            border: 3px solid rgba(255,255,255,0.3);
+        }
+
+        .profile-name {
+            font-size: 1.3em;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .profile-details {
+            font-size: 0.85em;
+            opacity: 0.9;
+        }
+
+        .profile-level {
+            background: rgba(255,255,255,0.2);
+            padding: 6px 14px;
+            border-radius: 20px;
+            display: inline-block;
+            margin-top: 8px;
+            font-weight: 600;
+        }
+
+        .alert-box {
+            background: #ffebee;
+            border-left: 4px solid #DC3545;
+            padding: 14px;
+            margin-bottom: 12px;
+            border-radius: 8px;
+            color: #333;
+        }
+
+        .alert-title {
+            font-weight: 700;
+            color: #DC3545;
+            margin-bottom: 4px;
+        }
+
+        .notification {
+            background: #e3f2fd;
+            border-left: 4px solid #193682;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            font-size: 0.9em;
+        }
+
+        .notification-title {
+            font-weight: 700;
+            color: #193682;
+            margin-bottom: 4px;
+        }
+
+        .bottom-nav {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            background: white;
+            border-top: 1px solid #eee;
+            padding: 10px 0;
+            position: fixed;
+            bottom: 14px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: calc(340px - 28px);
+            border-radius: 25px;
+            z-index: 100;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3px;
+            cursor: pointer;
+            color: #999;
+            font-size: 0.65em;
+            transition: color 0.3s;
+            padding: 8px;
+            flex: 1;
+        }
+
+        .nav-item.active {
+            color: #193682;
+            font-weight: 700;
+        }
+
+        .nav-item:hover {
+            color: #193682;
+        }
+
+        .nav-icon {
+            font-size: 1.4em;
+        }
+
+        .hidden-screen {
+            display: none;
+        }
+
+        .controls {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+            align-items: center;
+        }
+
+        .control-btn {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 2px solid white;
+            padding: 10px 16px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 0.9em;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .control-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .control-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .screen-indicator {
+            color: rgba(255,255,255,0.7);
+            font-size: 0.85em;
+        }
+
+        .feature-box {
+            background: #f8f9ff;
+            border-left: 4px solid #193682;
+            padding: 12px;
+            border-radius: 8px;
+            margin: 12px 0;
+            font-size: 0.9em;
+            color: #333;
+            line-height: 1.5;
+        }
+
+        .feature-box strong {
+            color: #193682;
+        }
+
+        .prediction-box {
+            background: linear-gradient(135deg, #193682 0%, #2d5a7b 100%);
+            color: white;
+            padding: 14px;
+            border-radius: 10px;
+            margin: 12px 0;
+            font-size: 0.9em;
+            box-shadow: 0 4px 12px rgba(25, 54, 130, 0.2);
+        }
+
+        .prediction-title {
+            font-weight: 700;
+            font-size: 0.95em;
+            margin-bottom: 6px;
+        }
+
+        .prediction-content {
+            font-size: 0.85em;
+            opacity: 0.95;
+        }
+
+        .recommendation-box {
+            background: #e3f2fd;
+            border-left: 4px solid #193682;
+            padding: 12px;
+            border-radius: 8px;
+            margin: 12px 0;
+            font-size: 0.9em;
+            color: #193682;
+        }
+
+        .recommendation-box strong {
+            color: #193682;
+        }
+
+        .facility-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin: 12px 0;
+        }
+
+        .facility-card {
+            background: #f8f9fa;
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .facility-label {
+            font-size: 0.8em;
+            color: #666;
+            margin-bottom: 6px;
+            font-weight: 600;
+        }
+
+        .facility-value {
+            font-size: 1.3em;
+            font-weight: 700;
+            color: #193682;
+            margin-bottom: 4px;
+        }
+
+        .facility-status {
+            font-size: 0.75em;
+            color: #999;
+        }
+
+        .why-this {
+            background: #f0f7ff;
+            border-left: 4px solid #28A745;
+            padding: 10px;
+            border-radius: 8px;
+            margin: 8px 0;
+            font-size: 0.85em;
+            color: #333;
+        }
+
+        .why-this strong {
+            color: #155724;
+        }
+
+        .time-wait {
+            display: inline-block;
+            background: #fff3cd;
+            color: #856404;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 0.8em;
+            font-weight: 600;
+            margin-top: 4px;
+        }
+
+        .comparison-row {
+            display: grid;
+            grid-template-columns: 1.5fr 0.8fr 0.8fr 0.8fr;
+            gap: 8px;
+            font-size: 0.8em;
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .comparison-row.header {
+            font-weight: 700;
+            color: #666;
+            border-bottom: 2px solid #ddd;
+            padding: 10px 0;
+        }
+
+        .comparison-label {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .station-favorite {
+            background: #f8f9fa;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 10px 12px;
+            margin: 6px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9em;
+        }
+
+        .station-favorite.current {
+            border-color: #193682;
+            background: #f8f9ff;
+        }
+
+        .station-name {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .station-badge {
+            font-size: 0.75em;
+            background: #193682;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+
+        .alert-critical {
+            background: #fff5f5;
+            border-left: 4px solid #DC3545;
+        }
+
+        .alert-critical .alert-title {
+            color: #DC3545;
+        }
+
+        .alert-warning {
+            background: #fffbf0;
+            border-left: 4px solid #E66432;
+        }
+
+        .alert-warning .alert-title {
+            color: #E66432;
+        }
+
+        .alert-info {
+            background: #e3f2fd;
+            border-left: 4px solid #193682;
+        }
+
+        .alert-info .alert-title {
+            color: #193682;
+        }
+
+        .alert-action {
+            background: #f0f7ff;
+            border-left: 4px solid #28A745;
+            padding: 10px;
+            border-radius: 6px;
+            margin-top: 8px;
+            font-size: 0.85em;
+            color: #155724;
+        }
+
+        .alert-action strong {
+            color: #155724;
+        }
+
+        /* ── Predicción multidía ── */
+        .nextdays-title {
+            font-size: 0.88em;
+            font-weight: 700;
+            color: #193682;
+            margin: 14px 0 8px 0;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .nextdays-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 7px;
+            margin-bottom: 14px;
+        }
+
+        .nextday-card {
+            background: #f8f9fa;
+            border: 1.5px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 10px 5px;
+            text-align: center;
+        }
+
+        .nextday-card.recommended {
+            border-color: #28A745;
+            background: #f0fff4;
+        }
+
+        .nextday-card .day-name {
+            font-weight: 700;
+            font-size: 0.78em;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .nextday-card.recommended .day-name {
+            color: #155724;
+        }
+
+        .nextday-card .day-icon {
+            font-size: 1.3em;
+            margin-bottom: 4px;
+            line-height: 1;
+        }
+
+        .nextday-card .day-level {
+            font-size: 0.72em;
+            font-weight: 700;
+            padding: 2px 5px;
+            border-radius: 5px;
+            display: inline-block;
+            margin-bottom: 4px;
+        }
+
+        .nextday-card .day-tip {
+            font-size: 0.68em;
+            color: #888;
+            line-height: 1.3;
+            margin-top: 2px;
+        }
+
+        /* ── Banner tipo de día (Mapa) ── */
+        .day-type-banner {
+            background: #fffbf0;
+            border: 1.5px solid #E66432;
+            border-radius: 8px;
+            padding: 9px 12px;
+            margin-bottom: 12px;
+        }
+
+        .day-type-banner .day-type-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.88em;
+        }
+
+        .day-type-banner .day-type-label {
+            color: #555;
+            font-weight: 500;
+        }
+
+        .day-type-banner .day-type-value {
+            font-weight: 700;
+            color: #E66432;
+        }
+
+        .day-type-banner .day-type-bullets {
+            margin-top: 5px;
+            font-size: 0.78em;
+            color: #666;
+            line-height: 1.5;
+        }
+
+        /* ── Alerta inteligente (patrones) ── */
+        .alert-smart {
+            background: #edf7ee;
+            border-left: 4px solid #28A745;
+            padding: 12px;
+            margin: 12px 0;
+            border-radius: 8px;
+        }
+
+        .alert-smart .alert-title {
+            font-weight: 700;
+            color: #155724;
+            margin-bottom: 4px;
+        }
+
+        .alert-smart .smart-tag {
+            display: inline-block;
+            background: #28A745;
+            color: white;
+            font-size: 0.7em;
+            font-weight: 700;
+            padding: 1px 6px;
+            border-radius: 4px;
+            margin-left: 4px;
+            vertical-align: middle;
+        }
+
+        /* ── Recomendación de estación (Perfil) ── */
+        .station-rec-block {
+            background: #f8f9ff;
+            border: 1.5px solid #c5cff5;
+            border-radius: 10px;
+            padding: 12px;
+            margin: 4px 0 14px 0;
+        }
+
+        .station-rec-header {
+            font-size: 0.75em;
+            color: #888;
+            margin-bottom: 8px;
+            font-style: italic;
+        }
+
+        .station-rec-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 7px 0;
+            border-bottom: 1px solid #eee;
+            font-size: 0.88em;
+        }
+
+        .station-rec-item:last-child {
+            border-bottom: none;
+        }
+
+        .station-rec-name {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .station-rec-badge {
+            font-size: 0.75em;
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-weight: 600;
+        }
+
+        .rec-low  { background: #d4edda; color: #155724; }
+        .rec-med  { background: #fff3cd; color: #856404; }
+        .rec-high { background: #f8d7da; color: #721c24; }
+
+        /* ── Planificador semanal (grid fijo 4+3) ── */
+        .week-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 6px;
+            margin: 8px 0 4px 0;
+        }
+
+        .week-card {
+            background: #f8f9fa;
+            border: 1.5px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 8px 4px;
+            text-align: center;
+        }
+
+        .week-card.wc-rec {
+            border-color: #28A745;
+            background: #f0fff4;
+        }
+
+        .wc-day {
+            font-size: 0.71em;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 4px;
+        }
+
+        .week-card.wc-rec .wc-day { color: #155724; }
+
+        .wc-dot {
+            font-size: 1.05em;
+            margin-bottom: 3px;
+            line-height: 1;
+        }
+
+        .wc-level {
+            font-size: 0.62em;
+            font-weight: 700;
+            padding: 2px 4px;
+            border-radius: 4px;
+            display: inline-block;
+        }
+
+        .wc-star {
+            font-size: 0.6em;
+            color: #28A745;
+            font-weight: 700;
+            margin-top: 2px;
+        }
+
+        /* ── Calidad de nieve (HOME) ── */
+        .snow-quality-box {
+            background: #f0f7ff;
+            border: 1.5px solid #b8d4f0;
+            border-radius: 10px;
+            padding: 11px 12px;
+            margin: 12px 0;
+        }
+
+        .snow-title {
+            font-weight: 700;
+            color: #193682;
+            font-size: 0.88em;
+            margin-bottom: 7px;
+        }
+
+        .snow-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 4px 0;
+            font-size: 0.83em;
+            border-bottom: 1px solid #d8eaf8;
+        }
+
+        .snow-row:last-of-type { border-bottom: none; }
+
+        .snow-label { color: #666; font-weight: 500; }
+        .snow-value { font-weight: 600; color: #333; }
+
+        .snow-badge {
+            font-size: 0.78em;
+            font-weight: 700;
+            padding: 2px 7px;
+            border-radius: 5px;
+        }
+
+        .snow-good { background: #d4edda; color: #155724; }
+        .snow-fair { background: #fff3cd; color: #856404; }
+        .snow-poor { background: #f8d7da; color: #721c24; }
+
+        .snow-impact {
+            font-size: 0.77em;
+            color: #445;
+            margin-top: 7px;
+            padding: 5px 8px;
+            background: rgba(25,54,130,0.06);
+            border-radius: 6px;
+            line-height: 1.45;
+        }
+
+        /* ── Calidad de nieve inline (MAPA por tipo de pista) ── */
+        .snow-inline {
+            font-size: 0.76em;
+            color: #777;
+            margin: -5px 0 11px 0;
+            padding-bottom: 11px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .snow-inline .snow-tag {
+            display: inline-block;
+            background: #e6f2fa;
+            color: #1a6fa8;
+            padding: 1px 5px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+
+        /* ── Nota disclaimer ── */
+        .disclaimer-note {
+            font-size: 0.73em;
+            color: #aaa;
+            font-style: italic;
+            text-align: center;
+            margin: 10px 0 4px 0;
+            padding: 6px 8px;
+            background: #f9f9f9;
+            border-radius: 6px;
+            line-height: 1.4;
+        }
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+        <div class="title">
+            <h1>SkiMaps</h1>
+            <p>Navegación inteligente en la estación</p>
+        </div>
+
+        <div class="phone">
+            <div class="phone-frame">
+                <div class="phone-notch"></div>
+
+                <!-- HOME -->
+                <div class="screen" id="screen-1">
+                    <div class="status-bar"><span>9:41</span><span>●●●●●</span></div>
+
+                    <div style="display:flex; justify-content:center; align-items:center; gap:12px; margin-bottom:12px;">
+                        <img src="logo_app_fin.png" style="width: 50px; height:50px;">
+                        <span style="font-weight:700; color:#193682;">Ski Maps</span>
+                    </div>
+
+                    <h2>Hoy</h2>
+                    <div class="screen-subtitle">Javalambre • Sábado 15 de marzo</div>
+
+                    <div class="prediction-box">
+                        <div class="prediction-title">📊 Predicción para hoy</div>
+                        <div class="prediction-content">Afluencia prevista <strong>alta</strong> a partir de las 12:00. Mejor esquiar antes de mediodía.</div>
+                    </div>
+
+                    <div class="snow-quality-box">
+                        <div class="snow-title">❄️ Calidad de nieve</div>
+                        <div class="snow-row">
+                            <span class="snow-label">Tipo</span>
+                            <span class="snow-value">Nieve pisada / dura</span>
+                        </div>
+                        <div class="snow-row">
+                            <span class="snow-label">Calidad</span>
+                            <span class="snow-badge snow-good">Buena</span>
+                        </div>
+                        <div class="snow-impact">
+                            💬 Ideal para nivel intermedio. Agarre firme por la mañana. Mayor fatiga a última hora por endurecimiento de la capa.
+                        </div>
+                    </div>
+
+                    <div class="recommendation-box">
+                        <strong>💡 ¿Cuándo ir?</strong><br>
+                        <span style="font-size: 0.85em;">Hoy se espera alta afluencia. Si tienes flexibilidad, el lunes es el mejor día de la semana según los patrones históricos.</span>
+                    </div>
+
+                    <div class="nextdays-title">🗓 Planificador semanal</div>
+                    <div class="week-grid">
+                        <div class="week-card">
+                            <div class="wc-dot">🔴</div>
+                            <div class="wc-day">Sáb</div>
+                            <div class="wc-level saturation-high">Alta</div>
+                        </div>
+                        <div class="week-card">
+                            <div class="wc-dot">🔴</div>
+                            <div class="wc-day">Dom</div>
+                            <div class="wc-level saturation-high">Alta</div>
+                        </div>
+                        <div class="week-card wc-rec">
+                            <div class="wc-dot">🟢</div>
+                            <div class="wc-day">Lun</div>
+                            <div class="wc-level saturation-low">Baja</div>
+                            <div class="wc-star">★ ideal</div>
+                        </div>
+                        <div class="week-card">
+                            <div class="wc-dot">🟢</div>
+                            <div class="wc-day">Mar</div>
+                            <div class="wc-level saturation-low">Baja</div>
+                        </div>
+                        <div class="week-card">
+                            <div class="wc-dot">🟡</div>
+                            <div class="wc-day">Mié</div>
+                            <div class="wc-level saturation-medium">Media</div>
+                        </div>
+                        <div class="week-card">
+                            <div class="wc-dot">🟡</div>
+                            <div class="wc-day">Jue</div>
+                            <div class="wc-level saturation-medium">Media</div>
+                        </div>
+                        <div class="week-card">
+                            <div class="wc-dot">🔴</div>
+                            <div class="wc-day">Vie</div>
+                            <div class="wc-level saturation-high">Alta</div>
+                        </div>
+                    </div>
+                    <div class="disclaimer-note" style="margin-bottom: 14px;">Estimación basada en patrones históricos, calendario y disponibilidad prevista.</div>
+
+                    <h3>Ocupación en pistas</h3>
+                    <div class="info-row"><span class="label">Zona iniciantes</span><span class="saturation-badge saturation-low">32%</span></div>
+                    <div class="info-row"><span class="label">Zona intermedia</span><span class="saturation-badge saturation-medium">58%</span></div>
+                    <div class="info-row"><span class="label">Remonte principal</span><span class="saturation-badge saturation-medium">52%</span></div>
+
+                    <h3>Instalaciones</h3>
+                    <div class="facility-grid">
+                        <div class="facility-card">
+                            <div class="facility-label">Parking</div>
+                            <div class="facility-value">78%</div>
+                            <div class="facility-status">Lleno hacia las 10:30</div>
+                        </div>
+                        <div class="facility-card">
+                            <div class="facility-label">Taquillas</div>
+                            <div class="facility-value">65%</div>
+                            <div class="facility-status">Capacidad media</div>
+                        </div>
+                    </div>
+
+                    <button class="button" onclick="goToScreen(3)">Planificar ruta</button>
+
+                    <div class="bottom-nav">
+                        <div class="nav-item active" onclick="goToScreen(1)"><span class="nav-icon">⌂</span><span>HOME</span></div>
+                        <div class="nav-item" onclick="goToScreen(3)"><span class="nav-icon">✕</span><span>RUTAS</span></div>
+                        <div class="nav-item" onclick="goToScreen(2)"><span class="nav-icon">◈</span><span>MAPA</span></div>
+                        <div class="nav-item" onclick="goToScreen(4)"><span class="nav-icon">!</span><span>ALERTAS</span></div>
+                        <div class="nav-item" onclick="goToScreen(5)"><span class="nav-icon">◯</span><span>PERFIL</span></div>
+                    </div>
+                </div>
+
+                <!-- MAPA -->
+                <div class="screen hidden-screen" id="screen-2">
+                    <div class="status-bar"><span>9:41</span><span>●●●●●</span></div>
+                    <h2>Mapa Estación</h2>
+                    <div class="screen-subtitle">Javalambre · Estimación basada en patrones</div>
+
+                    <div class="day-type-banner">
+                        <div class="day-type-row">
+                            <span>🟡</span>
+                            <span class="day-type-label">Tipo de día:</span>
+                            <span class="day-type-value">Medio</span>
+                        </div>
+                        <div class="day-type-bullets">
+                            → Disponibilidad moderada de pistas<br>
+                            → Afluencia controlada · Sin picos extremos
+                        </div>
+                    </div>
+
+                    <div class="map-visual" style="min-height: 120px;">
+                        <strong style="font-size: 0.95em;">Mapa de pistas de la estación</strong>
+                        <p style="font-size: 0.75em; margin-top: 8px; opacity: 0.7; line-height: 1.4;">Visualización de zonas de esquí y remontes. Ocupación estimada según patrones históricos.</p>
+                    </div>
+
+                    <h3>Estado de la estación</h3>
+                    <div class="facility-grid" style="grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px;">
+                        <div class="facility-card" style="border: 2px solid #193682; border-radius: 10px;">
+                            <div class="facility-label">Pistas abiertas</div>
+                            <div class="facility-value" style="font-size: 1.5em;">24/30</div>
+                            <div class="facility-status">6 en mantenimiento</div>
+                        </div>
+                        <div class="facility-card" style="border: 2px solid #193682; border-radius: 10px;">
+                            <div class="facility-label">Remontes activos</div>
+                            <div class="facility-value" style="font-size: 1.5em;">10/12</div>
+                            <div class="facility-status">2 en servicio técnico</div>
+                        </div>
+                    </div>
+
+                    <h3>Desglose por tipo de pista</h3>
+                    <div class="info-row" style="padding: 10px 0; border-bottom: 2px solid #eee;">
+                        <div style="flex: 1;">
+                            <div style="font-weight: 700; color: #28A745;">● Pistas Verdes</div>
+                        </div>
+                        <div style="color: #28A745; font-weight: 700; font-size: 0.95em;">8/10</div>
+                    </div>
+                    <div style="font-size: 0.8em; color: #666; margin: -8px 0 4px 0; padding-bottom: 0;">Espera estimada: ~5 min | ✓ Ideal ahora</div>
+                    <div class="snow-inline">❄️ Nieve pisada · <span class="snow-tag">Buena</span></div>
+
+                    <div class="info-row" style="padding: 10px 0; border-bottom: 2px solid #eee;">
+                        <div style="flex: 1;">
+                            <div style="font-weight: 700; color: #2d5a7b;">● Pistas Azules</div>
+                        </div>
+                        <div style="color: #2d5a7b; font-weight: 700; font-size: 0.95em;">10/12</div>
+                    </div>
+                    <div style="font-size: 0.8em; color: #666; margin: -8px 0 4px 0; padding-bottom: 0;">Espera estimada: ~15 min | ⚠ Pico entre 11-14h</div>
+                    <div class="snow-inline">❄️ Nieve dura · <span class="snow-tag">Estable</span></div>
+
+                    <div class="info-row" style="padding: 10px 0; border-bottom: 2px solid #eee;">
+                        <div style="flex: 1;">
+                            <div style="font-weight: 700; color: #DC3545;">● Pistas Rojas</div>
+                        </div>
+                        <div style="color: #DC3545; font-weight: 700; font-size: 0.95em;">6/8</div>
+                    </div>
+                    <div style="font-size: 0.8em; color: #666; margin: -8px 0 4px 0; padding-bottom: 0;">Espera estimada: ~22 min | Mejor después de 15h</div>
+                    <div class="snow-inline">❄️ Nieve transformada · <span class="snow-tag">Mejor por la mañana</span></div>
+
+                    <div class="info-row" style="padding: 10px 0; border-bottom: 2px solid #eee;">
+                        <div style="flex: 1;">
+                            <div style="font-weight: 700; color: #333;">● Pistas Negras</div>
+                        </div>
+                        <div style="color: #333; font-weight: 700; font-size: 0.95em;">2/4</div>
+                    </div>
+                    <div style="font-size: 0.8em; color: #666; margin: -8px 0 4px 0; padding-bottom: 0;">Espera estimada: ~10 min | Solo nivel avanzado</div>
+                    <div class="snow-inline" style="border-bottom: none; margin-bottom: 4px;">❄️ Nieve dura · <span class="snow-tag">Solo avanzado</span></div>
+
+                    <div class="recommendation-box" style="margin-top: 16px; background: #f0f7ff; border-left: 4px solid #193682; padding: 12px; border-radius: 8px;">
+                        <strong style="color: #193682;">🗺️ Dentro de la estación</strong><br>
+                        <span style="font-size: 0.85em; color: #333; margin-top: 6px; display: block;">Mayor disponibilidad estimada en pistas verdes y azules. Evita el sector alto en horas punta (11–14h).</span>
+                    </div>
+
+                    <div class="bottom-nav">
+                        <div class="nav-item" onclick="goToScreen(1)"><span class="nav-icon">⌂</span><span>HOME</span></div>
+                        <div class="nav-item" onclick="goToScreen(3)"><span class="nav-icon">✕</span><span>RUTAS</span></div>
+                        <div class="nav-item active" onclick="goToScreen(2)"><span class="nav-icon">◈</span><span>MAPA</span></div>
+                        <div class="nav-item" onclick="goToScreen(4)"><span class="nav-icon">!</span><span>ALERTAS</span></div>
+                        <div class="nav-item" onclick="goToScreen(5)"><span class="nav-icon">◯</span><span>PERFIL</span></div>
+                    </div>
+                </div>
+
+                <!-- RUTAS -->
+                <div class="screen hidden-screen" id="screen-3">
+                    <div class="status-bar"><span>9:41</span><span>●●●●●</span></div>
+                    <h2>Planificar Ruta</h2>
+                    <div class="screen-subtitle">Sugerencias basadas en patrones históricos</div>
+
+                    <div class="input-group"><label>Desde</label><input type="text" value="Remonte Sur"></div>
+                    <div class="input-group"><label>Hacia</label><input type="text" placeholder="¿A dónde quieres ir?"></div>
+                    <button class="button" style="margin-bottom: 16px;">Buscar rutas</button>
+
+                    <h3>Rutas disponibles</h3>
+
+                    <div class="route-card selected" onclick="selectRoute(this)">
+                        <div class="route-title">⭐ Ruta Recomendada (estimada)</div>
+                        <div class="route-detail">Remonte Sur → Pista Verde A → Pista Verde C</div>
+                        <div class="comparison-row" style="margin-top: 8px; padding: 0; border: none;">
+                            <span style="font-weight: 600;">Tiempo: 25 min</span>
+                            <span style="color: #28A745; font-weight: 700;">Espera est.: ~8 min</span>
+                            <span style="color: #666;">Fácil</span>
+                            <span style="color: #28A745;">32%</span>
+                        </div>
+                        <div class="why-this" style="margin-top: 10px;">
+                            <strong>Por qué esta ruta:</strong> Menor saturación estimada • Adecuada para tu nivel • Espera reducida según patrones
+                        </div>
+                    </div>
+
+                    <div class="route-card" onclick="selectRoute(this)">
+                        <div class="route-title">Ruta Alternativa 1 (estimada)</div>
+                        <div class="route-detail">Remonte Central → Pista Azul 1 → Pista Azul 2</div>
+                        <div class="comparison-row" style="margin-top: 8px; padding: 0; border: none;">
+                            <span style="font-weight: 600;">Tiempo: 32 min</span>
+                            <span style="color: #E66432; font-weight: 700;">Espera est.: ~15 min</span>
+                            <span style="color: #666;">Intermedia</span>
+                            <span style="color: #E66432;">58%</span>
+                        </div>
+                        <div style="font-size: 0.85em; color: #666; margin-top: 8px;">Más desafío técnico. Rutas más variadas.</div>
+                    </div>
+
+                    <div class="route-card" onclick="selectRoute(this)">
+                        <div class="route-title">Ruta Alternativa 2 (estimada)</div>
+                        <div class="route-detail">Remonte Directo → Pista Verde B</div>
+                        <div class="comparison-row" style="margin-top: 8px; padding: 0; border: none;">
+                            <span style="font-weight: 600;">Tiempo: 18 min</span>
+                            <span style="color: #28A745; font-weight: 700;">Espera est.: ~5 min</span>
+                            <span style="color: #666;">Muy Fácil</span>
+                            <span style="color: #28A745;">32%</span>
+                        </div>
+                        <div style="font-size: 0.85em; color: #666; margin-top: 8px;">La más rápida. Ideal si tienes poco tiempo.</div>
+                    </div>
+
+                    <div class="disclaimer-note">⚠ Basado en patrones históricos y disponibilidad estimada. No refleja condiciones en tiempo real.</div>
+
+                    <button class="button" style="margin-top: 8px;">Comenzar ruta seleccionada</button>
+
+                    <div class="bottom-nav">
+                        <div class="nav-item" onclick="goToScreen(1)"><span class="nav-icon">⌂</span><span>HOME</span></div>
+                        <div class="nav-item active" onclick="goToScreen(3)"><span class="nav-icon">✕</span><span>RUTAS</span></div>
+                        <div class="nav-item" onclick="goToScreen(2)"><span class="nav-icon">◈</span><span>MAPA</span></div>
+                        <div class="nav-item" onclick="goToScreen(4)"><span class="nav-icon">!</span><span>ALERTAS</span></div>
+                        <div class="nav-item" onclick="goToScreen(5)"><span class="nav-icon">◯</span><span>PERFIL</span></div>
+                    </div>
+                </div>
+
+                <!-- ALERTAS -->
+                <div class="screen hidden-screen" id="screen-4">
+                    <div class="status-bar"><span>9:41</span><span>●●●●●</span></div>
+                    <h2>Alertas</h2>
+                    <div class="screen-subtitle">Avisos operativos y predicciones</div>
+
+                    <div class="alert-smart">
+                        <div class="alert-title">🧠 Predicción de afluencia <span class="smart-tag">PATRÓN</span></div>
+                        <div style="font-size: 0.9em; color: #333; margin-bottom: 8px;">Este fin de semana se espera <strong>alta afluencia</strong> según patrones históricos de días similares (temperatura, festivo, época de temporada).</div>
+                        <div class="alert-action" style="background: #d4edda; color: #155724;">
+                            <strong>Sugerencia:</strong> Considera visitar el lunes o martes. Históricamente registran un 40% menos de afluencia.
+                        </div>
+                    </div>
+
+                    <div class="alert-box alert-critical" style="padding: 12px; margin: 12px 0; border-radius: 8px;">
+                        <div class="alert-title" style="margin-bottom: 6px;">🔴 Crítica: Alta afluencia esperada</div>
+                        <div style="font-size: 0.9em; color: #333; margin-bottom: 8px;">Zona intermedia llegará al 85% entre 11:00-14:00</div>
+                        <div class="alert-action">
+                            <strong>Acción recomendada:</strong> Evita esta zona en ese horario. Zona iniciantes disponible o accede después de las 15:00.
+                        </div>
+                    </div>
+
+                    <div class="alert-box alert-warning" style="padding: 12px; margin: 12px 0; border-radius: 8px;">
+                        <div class="alert-title" style="margin-bottom: 6px;">⚠️ Advertencia: Parking cercano al límite</div>
+                        <div style="font-size: 0.9em; color: #333; margin-bottom: 8px;">Capacidad del parking al 78%. Se completará sobre las 10:30.</div>
+                        <div class="alert-action">
+                            <strong>Sugerencia:</strong> Llega antes de las 10:00 o después de las 15:00 para mejor disponibilidad.
+                        </div>
+                    </div>
+
+                    <div class="alert-box alert-info" style="padding: 12px; margin: 12px 0; border-radius: 8px;">
+                        <div class="alert-title" style="margin-bottom: 6px;">ℹ️ Información: Remonte Central</div>
+                        <div style="font-size: 0.9em; color: #333;">Espera actual: 18 minutos. Usuarios cercanos reportan colas.</div>
+                    </div>
+
+                    <h3>Tus preferencias</h3>
+                    <div class="info-row"><span class="label">Alertas activas</span><span class="value">Sí</span></div>
+                    <div class="info-row"><span class="label">Umbral saturación</span><span class="value">70%</span></div>
+                    <div class="info-row"><span class="label">Notificaciones críticas</span><span class="value">Activas</span></div>
+
+                    <div class="bottom-nav">
+                        <div class="nav-item" onclick="goToScreen(1)"><span class="nav-icon">⌂</span><span>HOME</span></div>
+                        <div class="nav-item" onclick="goToScreen(3)"><span class="nav-icon">✕</span><span>RUTAS</span></div>
+                        <div class="nav-item" onclick="goToScreen(2)"><span class="nav-icon">◈</span><span>MAPA</span></div>
+                        <div class="nav-item active" onclick="goToScreen(4)"><span class="nav-icon">!</span><span>ALERTAS</span></div>
+                        <div class="nav-item" onclick="goToScreen(5)"><span class="nav-icon">◯</span><span>PERFIL</span></div>
+                    </div>
+                </div>
+
+                <!-- PERFIL -->
+                <div class="screen hidden-screen" id="screen-5">
+                    <div class="status-bar"><span>9:41</span><span>●●●●●</span></div>
+                    <div class="profile-header">
+                        <div class="profile-avatar">⛷️</div>
+                        <div class="profile-name">Beatriz Muñoz</div>
+                        <div class="profile-details">22 años • Madrid</div>
+                        <div class="profile-level">Nivel: Intermedia-Avanzada</div>
+                    </div>
+
+                    <div class="feature-box" style="background: #f0f7ff; border-left-color: #28A745; color: #155724; margin-bottom: 16px;">
+                        <strong>✓ Tus preferencias te ahorran ~10-15 min de espera promedio</strong><br>
+                        <span style="font-size: 0.85em;">El sistema elige rutas basadas en tu nivel y objetivo.</span>
+                    </div>
+
+                    <h3>Estación actual</h3>
+                    <div class="station-favorite current">
+                        <div class="station-name">🏔️ Javalambre</div>
+                        <div class="station-badge">Ahora</div>
+                    </div>
+
+                    <h3>Recomendado para ti</h3>
+                    <div class="station-rec-block">
+                        <div class="station-rec-header">Basado en tu nivel intermedio y preferencia por evitar colas</div>
+                        <div class="station-rec-item">
+                            <div>
+                                <div class="station-rec-name">🏔️ Javalambre</div>
+                                <div style="font-size: 0.75em; color: #888;">Mejor opción este fin de semana</div>
+                            </div>
+                            <span class="station-rec-badge rec-low">Baja saturación ✓</span>
+                        </div>
+                        <div class="station-rec-item">
+                            <div>
+                                <div class="station-rec-name">⛷️ Cerler</div>
+                                <div style="font-size: 0.75em; color: #888;">Pistas azules disponibles</div>
+                            </div>
+                            <span class="station-rec-badge rec-med">Equilibrado</span>
+                        </div>
+                        <div class="station-rec-item">
+                            <div>
+                                <div class="station-rec-name">🎿 Formigal</div>
+                                <div style="font-size: 0.75em; color: #888;">Destino popular · más colas</div>
+                            </div>
+                            <span class="station-rec-badge rec-high">Alta afluencia</span>
+                        </div>
+                    </div>
+
+                    <h3>Tus estaciones favoritas</h3>
+                    <div class="station-favorite">
+                        <div class="station-name">⭐ Formigal</div>
+                        <span style="font-size: 0.8em; color: #999;">Zona Pirineos</span>
+                    </div>
+                    <div class="station-favorite">
+                        <div class="station-name">⭐ Cerler</div>
+                        <span style="font-size: 0.8em; color: #999;">Zona Pirineos</span>
+                    </div>
+                    <div class="station-favorite">
+                        <div class="station-name">⭐ Sierra Nevada</div>
+                        <span style="font-size: 0.8em; color: #999;">Zona Sur</span>
+                    </div>
+
+                    <h3>Tu perfil técnico</h3>
+                    <div class="info-row"><span class="label">Experiencia</span><span class="value">8 años</span></div>
+                    <div class="info-row"><span class="label">Nivel técnico</span><span class="value">Intermedia</span></div>
+                    <div class="info-row"><span class="label">Velocidad</span><span class="value">Moderada</span></div>
+                    <div class="info-row"><span class="label">Riesgo tolerado</span><span class="value">Bajo-Medio</span></div>
+
+                    <h3>Preferencias de esquí</h3>
+                    <div class="info-row"><span class="label">Prioridad</span><span class="value">Evitar colas</span></div>
+                    <div class="info-row"><span class="label">Pistas favoritas</span><span class="value">Azules y verdes</span></div>
+                    <div class="info-row"><span class="label">Objetivo hoy</span><span class="value">Disfrutar</span></div>
+
+                    <h3>Opciones</h3>
+                    <button class="button secondary" style="margin-bottom: 8px;">Editar perfil</button>
+                    <button class="button secondary">Historial de esquí</button>
+
+                    <div class="bottom-nav">
+                        <div class="nav-item" onclick="goToScreen(1)"><span class="nav-icon">⌂</span><span>HOME</span></div>
+                        <div class="nav-item" onclick="goToScreen(3)"><span class="nav-icon">✕</span><span>RUTAS</span></div>
+                        <div class="nav-item" onclick="goToScreen(2)"><span class="nav-icon">◈</span><span>MAPA</span></div>
+                        <div class="nav-item" onclick="goToScreen(4)"><span class="nav-icon">!</span><span>ALERTAS</span></div>
+                        <div class="nav-item active" onclick="goToScreen(5)"><span class="nav-icon">◯</span><span>PERFIL</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button class="control-btn" id="prev-btn" onclick="previousScreen()">← Anterior</button>
+            <span class="screen-indicator"><span id="current-screen">1</span> / 5</span>
+            <button class="control-btn" id="next-btn" onclick="nextScreen()">Siguiente →</button>
+        </div>
+    </div>
+
+    <script>
+        let currentScreen = 1;
+        const totalScreens = 5;
+
+        function goToScreen(n) {
+            if (n < 1) n = 1;
+            if (n > totalScreens) n = totalScreens;
+
+            document.getElementById(`screen-${currentScreen}`).classList.add('hidden-screen');
+            currentScreen = n;
+            document.getElementById(`screen-${currentScreen}`).classList.remove('hidden-screen');
+            updateControls();
+        }
+
+        function nextScreen() {
+            goToScreen(currentScreen + 1);
+        }
+
+        function previousScreen() {
+            goToScreen(currentScreen - 1);
+        }
+
+        function updateControls() {
+            document.getElementById('current-screen').textContent = currentScreen;
+            document.getElementById('prev-btn').disabled = currentScreen === 1;
+            document.getElementById('next-btn').disabled = currentScreen === totalScreens;
+        }
+
+        updateControls();
+
+        function selectRoute(element) {
+            const routeCards = document.querySelectorAll('.route-card');
+            routeCards.forEach(card => card.classList.remove('selected'));
+            element.classList.add('selected');
+        }
+    </script>
+</body>
+</html>
